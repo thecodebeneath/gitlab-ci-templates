@@ -1,0 +1,3 @@
+include:
+  - 'ci/standard-template-usage.yml'
+  # - 'ci/customized-template-usage.yml'

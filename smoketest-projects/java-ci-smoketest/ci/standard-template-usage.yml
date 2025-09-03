@@ -1,0 +1,10 @@
+# ---
+# Standard project can use the template default pipeline as-is
+# ---
+include:
+  - project: "codebeneath/project-templates"
+    ref: "main"
+    file: "templates/java-default-pipeline.yml"
+
+variables:
+  MVN_PROJECT_ROOT: ${CI_PROJECT_DIR}/ci-test-jar

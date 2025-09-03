@@ -1,0 +1,75 @@
+variables:
+  TF_IMAGE: "hashicorp/terraform:1.12.2"
+  TF_ROOT: ${CI_PROJECT_DIR}/terraform
+
+stages:
+  - validate
+  - build
+  - test
+  - deploy
+  - cleanup
+  
+.base::tf-base:
+  image:
+    name: "$TF_IMAGE"
+    entrypoint: [""]
+  tags:
+    - tf
+  # id_tokens: # Request an OIDC token
+  #   GITLAB_OIDC_TOKEN:
+  #     aud: https://gitlab.codebeneath-labs.org
+  before_script:
+    # - >
+    #   aws_sts_output=$(aws sts assume-role-with-web-identity
+    #   --role-arn ${AWS_ROLE_ARN}
+    #   --role-session-name "GitLabRunner-${CI_PROJECT_ID}-${CI_PIPELINE_ID}"
+    #   --web-identity-token ${GITLAB_OIDC_TOKEN}
+    #   --duration-seconds 3600
+    #   --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]'
+    #   --output text)
+    # - export $(printf "AWS_ACCESS_KEY_ID=%s AWS_SECRET_ACCESS_KEY=%s AWS_SESSION_TOKEN=%s" $aws_sts_output)
+    # - aws sts get-caller-identity
+    - cd ${TF_ROOT}
+    - terraform --version
+    - terraform init -input=false
+
+.verify::tf-validate:
+  extends: .base::tf-base
+  stage: validate
+  script:
+    - terraform validate
+    # - echo "Confirming the backend S3 bucket exists..."
+    # - aws s3 ls $(echo s3://$(grep bucket backend.tf | cut -d\" -f2))
+
+.build::tf-plan:
+  extends: .base::tf-base
+  stage: build
+  script:
+    - echo "Generating tf plan..."
+    # - terraform plan -out=tfplan -input=false
+    - touch ${TF_ROOT}/tfplan
+  artifacts:
+    paths:
+      - ${TF_ROOT}/tfplan
+    access: 'developer'
+    expire_in: "5 days"
+
+.deploy::tf-apply:
+  extends: .base::tf-base
+  stage: deploy
+  dependencies:
+    - build:tf-plan
+  script:
+    - echo "Applying tf plan..."
+    # - terraform apply -input=false tfplan
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH     # Apply only on default branch
+      when: manual                                    # Manual trigger for prod changes in best practice
+    - if: $CI_COMMIT_BRANCH =~ /^env\//
+      when: on_success
+
+.cleanup::tf-cleanup:
+  extends: .base::tf-base
+  stage: cleanup
+  script:
+    - echo "Cleanup tf..."

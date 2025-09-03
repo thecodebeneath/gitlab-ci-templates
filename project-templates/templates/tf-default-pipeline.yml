@@ -1,0 +1,19 @@
+# ---
+# Standard project can use the template default pipeline as-is
+# ---
+include:
+  - project: "codebeneath/project-templates"
+    ref: "main"
+    file: "templates/tf-template-base.yml"
+
+validate::tf-validate:
+  extends: .validate::tf-validate
+
+build::tf-plan:
+  extends: .build::tf-plan
+
+deploy::tf-apply:
+  extends: .build::tf-plan
+
+cleanup::tf-cleanup:
+  extends: .cleanup::tf-cleanup

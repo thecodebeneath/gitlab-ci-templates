@@ -1,0 +1,7 @@
+# ---
+# Standard project can use the default template pipeline as-is
+# ---
+include:
+  - project: "codebeneath/project-templates"
+    ref: "main"
+    file: "templates/tf-default-pipeline.yml"

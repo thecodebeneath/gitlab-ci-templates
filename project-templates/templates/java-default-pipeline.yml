@@ -1,0 +1,22 @@
+# ---
+# Standard project can use the template default pipeline as-is
+# ---
+include:
+  - project: "codebeneath/project-templates"
+    ref: "main"
+    file: "templates/java-template-base.yml"
+
+validate::java-validate:
+  extends: .validate::java-validate
+
+build::java-build:
+  extends: .build::java-build
+
+build::java-unit-test:
+  extends: .build::java-unit-test
+
+build::java-package:
+  extends: .build::java-package
+
+cleanup::java-cleanup:
+  extends: .cleanup::java-cleanup

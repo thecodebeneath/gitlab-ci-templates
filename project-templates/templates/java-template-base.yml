@@ -1,0 +1,68 @@
+variables:
+  MVN_IMAGE: "maven:3.8-openjdk-17"
+  MVN_PROJECT_ROOT: ${CI_PROJECT_DIR}
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+
+cache:
+  paths:
+    - .m2/repository/
+
+stages:
+  - validate
+  - build
+  - package
+  - test
+  - deploy
+  - cleanup
+  
+.base::java-base:
+  image: 
+    name: "$MVN_IMAGE"
+  tags:
+    - java
+  before_script:
+    - cd ${MVN_PROJECT_ROOT}
+    - mvn --version
+
+.validate::java-validate:
+  extends: .base::java-base
+  stage: validate
+  script:
+    - mvn validate
+
+.build::java-compile:
+  extends: .base::java-base
+  stage: build
+  script:
+    - echo "Building java project..."
+    - mvn compile
+
+.build::java-unit-test:
+  extends: .base::java-base
+  stage: build
+  dependencies:
+    - build::java-compile
+  script:
+    - echo "Running java tests..."
+    - mvn test
+
+.build::java-package:
+  extends: .base::java-base
+  stage: package
+  dependencies:
+    - build::java-unit-test
+  script:
+    - echo "Building java package..."
+    - mvn package -DskipTests=true
+  artifacts:
+    paths:
+      - ${MVN_PROJECT_ROOT}/target/*.jar
+    access: 'developer'
+    expire_in: "5 days"
+
+.cleanup::java-cleanup:
+  extends: .base::java-base
+  stage: cleanup
+  script:
+    - echo "Cleanup java..."
+    - mvn clean

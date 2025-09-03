@@ -1,0 +1,20 @@
+# ---
+# Custom project needs to extend the base template vars and jobs
+# ---
+include:
+  - project: "codebeneath/project-templates"
+    ref: "main"
+    file: "templates/tf-template-base.yml"
+
+variables:
+  TF_IMAGE: "hashicorp/terraform:1.12.0"
+
+validate::tf-validate:
+  extends:
+    - .base::tf-base
+    - .validate::tf-validate
+  stage: validate
+  before_script:
+    - !reference [.validate::tf-validate, before_script]
+    - echo "Running custom before_script steps..."
+    - echo "tofu -version"
