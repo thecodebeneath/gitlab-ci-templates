@@ -9,10 +9,11 @@ cache:
 
 stages:
   - validate
+  - scan
   - build
   - package
-  - test
   - deploy
+  - test
   - cleanup
   
 .base::java-base:
@@ -30,6 +31,12 @@ stages:
   script:
     - mvn validate
 
+.scan::java-scan:
+  extends: .base::java-base
+  stage: scan
+  script:
+    - echo "Scanning java project..."
+
 .build::java-compile:
   extends: .base::java-base
   stage: build
@@ -40,17 +47,13 @@ stages:
 .build::java-unit-test:
   extends: .base::java-base
   stage: build
-  dependencies:
-    - build::java-compile
   script:
     - echo "Running java tests..."
     - mvn test
 
-.build::java-package:
+.package::java-package:
   extends: .base::java-base
   stage: package
-  dependencies:
-    - build::java-unit-test
   script:
     - echo "Building java package..."
     - mvn package -DskipTests=true
@@ -60,9 +63,36 @@ stages:
     access: 'developer'
     expire_in: "5 days"
 
+.package::java-oci-build:
+  extends: .base::java-base
+  stage: package
+  needs:
+    - .package::java-package
+  script:
+    - echo "Building docker image for java app..."
+    # - docker build . -t java-test-jar:latest
+    - echo "Pushing docker image for java app..."
+    # - docker push java-test-jar:latest
+
+.deploy::java-oci-deploy:
+  extends: .base::java-base
+  stage: deploy
+  script:
+    - echo "Deploy java oci to k8s..."
+    # - kubectl apply -f ci-test-jar.yaml...
+
+.test::java-security-test:
+  extends: .base::java-base
+  stage: test
+  script:
+    - echo "OWASP ZAP testing deployed java app..."
+
 .cleanup::java-cleanup:
   extends: .base::java-base
   stage: cleanup
   script:
     - echo "Cleanup java..."
     - mvn clean
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $DESTROY_INFRA == "true"   # Requires explicit var value
+      when: manual

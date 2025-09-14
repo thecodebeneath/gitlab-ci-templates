@@ -1,14 +1,17 @@
 variables:
   TF_IMAGE: "hashicorp/terraform:1.12.2"
   TF_ROOT: ${CI_PROJECT_DIR}/terraform
+  DESTROY_INFRA:
+    description: "Optional action to destroy managed resources"
+    value: "false"
 
 stages:
   - validate
+  - scan
   - build
-  - test
   - deploy
   - cleanup
-  
+
 .base::tf-base:
   image:
     name: "$TF_IMAGE"
@@ -33,13 +36,20 @@ stages:
     - terraform --version
     - terraform init -input=false
 
-.verify::tf-validate:
+.validate::tf-validate:
   extends: .base::tf-base
   stage: validate
   script:
     - terraform validate
     # - echo "Confirming the backend S3 bucket exists..."
     # - aws s3 ls $(echo s3://$(grep bucket backend.tf | cut -d\" -f2))
+
+.scan::tf-scan:
+  extends: .base::tf-base
+  stage: scan
+  script:
+    - echo "Scanning tf modules..."
+    # - checkov --directory /tf
 
 .build::tf-plan:
   extends: .base::tf-base
@@ -58,7 +68,7 @@ stages:
   extends: .base::tf-base
   stage: deploy
   dependencies:
-    - build:tf-plan
+    - .build::tf-plan
   script:
     - echo "Applying tf plan..."
     # - terraform apply -input=false tfplan
@@ -71,5 +81,11 @@ stages:
 .cleanup::tf-cleanup:
   extends: .base::tf-base
   stage: cleanup
+  dependencies:
+    - .build::tf-plan
   script:
     - echo "Cleanup tf..."
+    # - terraform destroy -input=false -auto-approve
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $DESTROY_INFRA == "true"   # Requires explicit var value
+      when: manual

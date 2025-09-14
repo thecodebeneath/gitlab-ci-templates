@@ -9,11 +9,18 @@ include:
 validate::tf-validate:
   extends: .validate::tf-validate
 
+scan::tf-scan:
+  extends: .scan::tf-scan
+
 build::tf-plan:
   extends: .build::tf-plan
 
 deploy::tf-apply:
-  extends: .build::tf-plan
+  extends: .deploy::tf-apply
+  dependencies:
+    - build::tf-plan
 
 cleanup::tf-cleanup:
   extends: .cleanup::tf-cleanup
+  dependencies:
+    - build::tf-plan

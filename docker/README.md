@@ -12,8 +12,17 @@ sudo dpkg -i gitlab-runner-helper-images.deb gitlab-runner_amd64.deb
 ```
 
 # Register instance runner
+As Gitlab root user, create a personal access token:
+- Administrator > Edit profile > Access tokens > Add new token
+  - Token name: runner-token
+  - Scopes: create_runner, manage_runner
+- Create token
+- Copy token
 
 ```bash
+cd ~/gitlab
+
+export GITLAB_ACCESS_TOKEN="<ACCESSTOKEN>"
 ./register-gitlab-runner.sh
 ```
 

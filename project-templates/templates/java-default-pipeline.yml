@@ -9,14 +9,28 @@ include:
 validate::java-validate:
   extends: .validate::java-validate
 
-build::java-build:
-  extends: .build::java-build
+scan::java-scan:
+  extends: .scan::java-scan
+
+build::java-compile:
+  extends: .build::java-compile
 
 build::java-unit-test:
   extends: .build::java-unit-test
 
-build::java-package:
-  extends: .build::java-package
+package::java-package:
+  extends: .package::java-package
+
+package::java-oci-build:
+  extends: .package::java-oci-build
+  needs:
+    - package::java-package
+
+deploy::java-oci-deploy:
+  extends: .deploy::java-oci-deploy
+
+test::java-security-test:
+  extends: .test::java-security-test
 
 cleanup::java-cleanup:
   extends: .cleanup::java-cleanup
