@@ -1,0 +1,23 @@
+# ---
+# Standard project can use the template default pipeline as-is
+# ---
+include:
+  - project: "codebeneath/project-templates"
+    ref: "main"
+    file: "templates/java-default-pipeline.yml"
+  - project: "codebeneath/project-templates"
+    ref: "main"
+    file: "templates/tf-default-pipeline.yml"
+
+# Combine all stages from any template includes above
+stages:
+  - validate
+  - scan
+  - build
+  - package
+  - deploy
+  - test
+  - cleanup
+
+variables:
+  MVN_PROJECT_ROOT: ${CI_PROJECT_DIR}/ci-test-jar

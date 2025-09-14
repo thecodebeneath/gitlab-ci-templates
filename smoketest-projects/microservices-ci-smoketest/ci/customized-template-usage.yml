@@ -1,0 +1,33 @@
+# ---
+# Custom project needs to extend the base template vars and jobs
+# ---
+include:
+  - project: "codebeneath/project-templates"
+    ref: "main"
+    file: "templates/java-template-base.yml"
+  - project: "codebeneath/project-templates"
+    ref: "main"
+    file: "templates/tf-template-base.yml"
+
+variables:
+  MVN_IMAGE: "maven:3.8-openjdk-17-slim"
+  MVN_PROJECT_ROOT: ${CI_PROJECT_DIR}/ci-test-jar
+  TF_IMAGE: "hashicorp/terraform:1.12.0"
+
+validate::java-validate:
+  extends:
+    - .base::java-base
+    - .validate::java-validate
+  stage: validate
+  after_script:
+    - echo "Custom validate phase after_script steps..."
+
+validate::tf-validate:
+  extends:
+    - .base::tf-base
+    - .validate::tf-validate
+  stage: validate
+  before_script:
+    - !reference [.validate::tf-validate, before_script]
+    - echo "Running custom before_script steps..."
+    - echo "tofu -version"

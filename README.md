@@ -62,12 +62,18 @@ validate::tf-validate:
 
 ## Smoketest Project Stubs
 
-For testing the CI templates, these two projects can be created in the same `codebeneath` group. Setup a Gitlab runner with tags for `tf` and `java` so the pipelines can be tested.
+For testing the CI templates, these following projects can be created in the same `codebeneath` group. Setup a Gitlab runner with tags for `tf` and `java` so the pipelines can be tested.
 
-> There are two smoketest projects to showcase the naming conventions for templates, stages and jobs.
+> There are three smoketest projects to showcase the naming conventions for templates, stages and jobs.
 
-### Terraform
-Populate a new `codebeneath/tf-ci-smoketest` project with the folder structure under `./smoketest-projects/tf-ci-smoketest`
+### Terraform Project
+This project contains terraform modules that include the templates for terraform pipelines.
+- Populate a new `codebeneath/tf-ci-smoketest` project with the folder structure under `./smoketest-projects/tf-ci-smoketest`
 
-### Java
-Populate a new `codebeneath/java-ci-smoketest` project with the folder structure under `./smoketest-projects/java-ci-smoketest`
+### Java Project
+This project contains terraform modules that include the templates for terraform pipelines.
+- Populate a new `codebeneath/java-ci-smoketest` project with the folder structure under `./smoketest-projects/java-ci-smoketest`
+
+### Microservice Project
+This microservice project contains both application code and supporting infrastructure, representing a self-contained service repo. It has terraform modules and java source code. It therefore will include multiple pipeline templates supporting the build and deployment of the service.
+- Populate a new `codebeneath/microservices-ci-smoketest` project with the folder structure under `./smoketest-projects/microservices-ci-smoketest`
