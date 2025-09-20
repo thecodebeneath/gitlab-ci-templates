@@ -2,9 +2,7 @@
 # Standard project can use the template default pipeline as-is
 # ---
 include:
-  - project: "codebeneath/project-templates"
-    ref: "main"
-    file: "templates/tf-template-base.yml"
+  - local: "templates/tf-template-base.yml"
 
 validate::tf-validate:
   extends: .validate::tf-validate

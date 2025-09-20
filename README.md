@@ -29,7 +29,7 @@ Consuming project `.gitlab-ci.yml` file:
 include:
   - project: "codebeneath/project-templates"
     ref: "main"
-    file: "templates/tf-default-pipeline.yml"
+    file: "ci/tf-default-pipeline.yml"
 ```
 
 ### Customized Project Example:

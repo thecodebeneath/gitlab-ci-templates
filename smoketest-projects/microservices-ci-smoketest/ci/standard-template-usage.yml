@@ -4,10 +4,10 @@
 include:
   - project: "codebeneath/project-templates"
     ref: "main"
-    file: "templates/java-default-pipeline.yml"
+    file: "ci/java-default-pipeline.yml"
   - project: "codebeneath/project-templates"
     ref: "main"
-    file: "templates/tf-default-pipeline.yml"
+    file: "ci/tf-default-pipeline.yml"
 
 # Combine all stages from any template includes above
 stages:
